@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// 1. Defines the database connection. We are using PostgreSQL.
+// The URL is loaded from the .env file.
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 2. Defines the Prisma Client generator.
+// This tells Prisma to generate the client code in the node_modules folder.
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 3. Defines the User model.
+// This will store user information, likely synced with your auth provider (e.g., Clerk).
+model User {
+  id        String      @id @unique
+  email     String      @unique
+  firstName String?
+  lastName  String?
+  photo     String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Relation: A user can create many discounts.
+  discounts Discount[]
+}
+
+// 4. Defines the Discount model.
+// This is the core model for the perks/discounts in your app.
+model Discount {
+  id                 String    @id @default(cuid())
+  title              String
+  description        String?
+  discountValue      String
+  imageUrl           String
+  startDate          DateTime
+  endDate            DateTime
+  termsAndConditions String?
+  category           String?   // For future filtering (e.g., "Food", "Entertainment")
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  // Relation: Each discount is created by one user.
+  creator   User   @relation(fields: [creatorId], references: [id])
+  creatorId String
+}
