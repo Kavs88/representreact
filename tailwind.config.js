@@ -9,7 +9,11 @@ module.exports = {
     './node_modules/@shadcn/ui/dist/**/*.js',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'primary-dark': '#111827',
+      },
+    },
   },
   plugins: [require('tailwindcss-animate')],
 }; 

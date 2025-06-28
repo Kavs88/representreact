@@ -134,22 +134,22 @@ export default function HomePage() {
   }, [isCarouselPaused]);
 
   return (
-    <div className="min-h-screen bg-[#0e0e0e] text-white font-sans">
-      {/* Hero Section - Enhanced with Parallax */}
-      <section className="relative py-16 md:py-20 flex items-center justify-center overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground font-sans">
+      {/* Hero Section - Premium Minimalist */}
+      <section className="relative bg-primary-dark text-background min-h-[60vh] flex flex-col items-center justify-center text-center px-4 pt-20">
         {/* Background with subtle gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0e0e0e] via-[#101010] to-[#0a0a0a]"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-gray-900 to-primary-dark"></div>
         
         {/* Animated background elements */}
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-5">
           <div className="absolute top-10 left-10 w-64 h-64 bg-gradient-to-r from-[#00ff9d] to-[#008f57] rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-10 right-10 w-80 h-80 bg-gradient-to-r from-[#008f57] to-[#00ff9d] rounded-full blur-3xl animate-pulse delay-1000"></div>
         </div>
 
         {/* Main content */}
-        <div className="relative z-10 text-center max-w-5xl mx-auto px-6">
-          <div className="mb-6 animate-fade-in">
-            <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-4">
+        <div className="relative z-10 max-w-5xl mx-auto">
+          <div className="mb-6">
+            <h1 className="font-serif text-5xl md:text-7xl font-bold tracking-tight leading-none mb-4">
               <span className="text-white">DISCOVER</span>
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00ff9d] to-[#008f57]">
@@ -160,13 +160,13 @@ export default function HomePage() {
             </h1>
           </div>
           
-          <p className="text-lg md:text-xl text-gray-300 mb-8 font-light max-w-2xl mx-auto leading-relaxed animate-fade-in-delay">
+          <p className="mt-4 text-lg md:text-xl max-w-2xl text-gray-300 mx-auto leading-relaxed">
             A curated platform showcasing the most innovative contemporary artists from around the world.
           </p>
           
           <RevealOnScroll delay={1.0}>
             <Link href="/artists">
-              <MagneticButton className="bg-gradient-to-r from-[#00ff9d] to-[#008f57] hover:from-[#00e68a] hover:to-[#007a4a] text-black font-bold text-lg px-8 py-4 rounded-full shadow-2xl transition-all duration-300">
+              <MagneticButton className="bg-gradient-to-r from-[#00ff9d] to-[#008f57] hover:from-[#00e68a] hover:to-[#007a4a] text-black font-bold text-lg px-8 py-4 rounded-full shadow-2xl transition-all duration-300 mt-8">
                 View All Artists
               </MagneticButton>
             </Link>
@@ -174,42 +174,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Artwork Carousel - Enhanced with Motion */}
-      <section className="py-16 bg-[#0e0e0e] overflow-hidden">
-        <div 
-          className="relative"
-          onMouseEnter={() => setIsCarouselPaused(true)}
-          onMouseLeave={() => setIsCarouselPaused(false)}
-        >
-          <div className="flex transition-transform duration-1000 ease-in-out" style={{ transform: `translateX(-${currentArtworkIndex * 100}%)` }}>
-            {artworkImages.map((image, index) => (
-              <div key={index} className="w-full flex-shrink-0 px-4">
-                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl group">
-                  <img 
-                    src={image} 
-                    alt={`Contemporary artwork ${index + 1}`}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {/* Carousel indicators */}
-          <div className="flex justify-center mt-8 space-x-2">
-            {artworkImages.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentArtworkIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentArtworkIndex 
-                    ? 'bg-gradient-to-r from-[#00ff9d] to-[#008f57]' 
-                    : 'bg-gray-600 hover:bg-gray-500'
-                }`}
-              />
-            ))}
-          </div>
+      {/* Featured Work Section - Placeholder for Carousel */}
+      <section className="w-full bg-background py-16 md:py-24">
+        {/* Placeholder for Featured Artist Carousel to be built next */}
+        <div className="text-center">
+          <h2 className="font-serif text-4xl text-foreground">Featured Work</h2>
         </div>
       </section>
 
