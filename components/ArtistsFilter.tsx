@@ -11,40 +11,67 @@ export default function ArtistsFilter({ artists }: ArtistsFilterProps) {
   const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
   const [searchTerm, setSearchTerm] = React.useState("");
 
-  // Get all unique tags from artists
+  // Add debugging
+  console.log("ArtistsFilter received artists:", artists);
+
+  // Get all unique tags from artists with error handling
   const allTags = React.useMemo(() => {
-    const tags = artists.flatMap(artist => 
-      Array.isArray(artist.fields.Specialties) 
-        ? artist.fields.Specialties 
-        : typeof artist.fields.Specialties === 'string'
-          ? artist.fields.Specialties.split(',').map(s => s.trim())
-          : []
-    );
+    if (!artists || !Array.isArray(artists)) {
+      console.warn("Artists is not an array:", artists);
+      return [];
+    }
+
+    const tags = artists.flatMap(artist => {
+      if (!artist || !artist.fields) {
+        console.warn("Artist or artist.fields is missing:", artist);
+        return [];
+      }
+
+      const specialties = artist.fields.Specialties;
+      if (Array.isArray(specialties)) {
+        return specialties;
+      } else if (typeof specialties === 'string') {
+        return specialties.split(',').map(s => s.trim());
+      } else {
+        return [];
+      }
+    });
+    
     return Array.from(new Set(tags)).sort();
   }, [artists]);
 
   // Filter artists based on selected tags and search term
   const filteredArtists = React.useMemo(() => {
+    if (!artists || !Array.isArray(artists)) {
+      return [];
+    }
+
     let filtered = artists;
     
     if (selectedTags.length > 0) {
-      filtered = filtered.filter(artist => 
-        selectedTags.some(tag => {
-          const artistSpecialties = Array.isArray(artist.fields.Specialties) 
-            ? artist.fields.Specialties 
-            : typeof artist.fields.Specialties === 'string'
-              ? artist.fields.Specialties.split(',').map(s => s.trim())
-              : [];
-          return artistSpecialties.includes(tag);
-        })
-      );
+      filtered = filtered.filter(artist => {
+        if (!artist || !artist.fields) return false;
+        
+        const artistSpecialties = Array.isArray(artist.fields.Specialties) 
+          ? artist.fields.Specialties 
+          : typeof artist.fields.Specialties === 'string'
+            ? artist.fields.Specialties.split(',').map(s => s.trim())
+            : [];
+        
+        return selectedTags.some(tag => artistSpecialties.includes(tag));
+      });
     }
     
     if (searchTerm) {
-      filtered = filtered.filter(artist => 
-        artist.fields.Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        artist.fields.Specialty?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      filtered = filtered.filter(artist => {
+        if (!artist || !artist.fields) return false;
+        
+        const name = artist.fields.Name || '';
+        const specialty = artist.fields.Specialty || '';
+        
+        return name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+               specialty.toLowerCase().includes(searchTerm.toLowerCase());
+      });
     }
     
     return filtered;
@@ -62,6 +89,18 @@ export default function ArtistsFilter({ artists }: ArtistsFilterProps) {
     setSelectedTags([]);
     setSearchTerm("");
   };
+
+  // Show loading state if artists is not available
+  if (!artists || !Array.isArray(artists)) {
+    return (
+      <section className="py-20 bg-[#0e0e0e]">
+        <div className="container mx-auto px-6 text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#00ff9d] mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading artists...</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <>
