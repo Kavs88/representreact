@@ -105,4 +105,41 @@ export const getArtistByName = async (name: string): Promise<Artist | null> => {
     console.error(`Error fetching artist by name ${name}:`, error);
     return null;
   }
+};
+
+// Helper to process a single Airtable record with Zod validation
+const processRecord = (record: any): Artist | null => {
+  const validatedData = artistSchema.safeParse(record);
+  if (!validatedData.success) {
+    console.error('Zod validation error for artist:', validatedData.error);
+    return null;
+  }
+  return validatedData.data;
+};
+
+// Fetch all artists, validate, and return only valid records
+export const getArtists = async (): Promise<Artist[]> => {
+  try {
+    if (!AIRTABLE_BASE_ID || !AIRTABLE_API_KEY) {
+      console.error('Missing Airtable configuration');
+      return [];
+    }
+    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${ARTISTS_TABLE}`;
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      console.error(`Airtable API error: ${response.status}`);
+      return [];
+    }
+    const data = await response.json();
+    if (!data.records) return [];
+    return data.records.map(processRecord).filter(Boolean) as Artist[];
+  } catch (error) {
+    console.error('Error fetching artists:', error);
+    return [];
+  }
 }; 

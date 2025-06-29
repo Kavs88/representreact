@@ -12,6 +12,9 @@ module.exports = {
     extend: {
       colors: {
         'primary-dark': '#111827',
+        'theme-bg': 'var(--bg-color)',
+        'theme-text': 'var(--text-color)',
+        'theme-primary': 'var(--primary-color)',
       },
     },
   },

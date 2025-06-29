@@ -2,6 +2,7 @@ import React from "react";
 import "/globals.css";
 import Link from "next/link";
 import GlobalMotionWrapper from "../components/GlobalMotionWrapper";
+import { Toaster } from "react-hot-toast";
 
 export const metadata = {
   title: "Represent+ Artist Platform",
@@ -12,6 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-[#0e0e0e] text-white font-sans">
+        <Toaster position="top-right" />
         {/* Navigation */}
         <header className="fixed top-0 left-0 w-full bg-[#0e0e0e]/90 backdrop-blur-sm z-50 border-b border-gray-800">
           <div className="container mx-auto flex items-center justify-between h-20 px-6">

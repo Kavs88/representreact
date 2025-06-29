@@ -1,15 +1,38 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
 import { Label } from "../../components/ui/label";
+import toast from "react-hot-toast";
 
 function ContactForm() {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted");
+    setIsSubmitting(true);
+
+    // Simulate form submission with toast feedback
+    const submitPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        // Simulate success (in real app, this would be an API call)
+        const success = Math.random() > 0.3; // 70% success rate for demo
+        if (success) {
+          resolve("Message sent successfully!");
+        } else {
+          reject(new Error("Failed to send message. Please try again."));
+        }
+      }, 2000);
+    });
+
+    toast.promise(submitPromise, {
+      loading: 'Sending your message...',
+      success: (message) => message as string,
+      error: (error) => error.message,
+    }).finally(() => {
+      setIsSubmitting(false);
+    });
   };
 
   return (
@@ -21,7 +44,8 @@ function ContactForm() {
             id="firstName" 
             type="text" 
             required 
-            className="mt-2 bg-[#101010] border-gray-700 text-white placeholder-gray-400 focus:border-[#00ff9d] focus:ring-[#00ff9d]"
+            disabled={isSubmitting}
+            className="mt-2 bg-[#101010] border-gray-700 text-white placeholder-gray-400 focus:border-[#00ff9d] focus:ring-[#00ff9d] disabled:opacity-50"
             placeholder="Enter your first name"
           />
         </div>
@@ -31,7 +55,8 @@ function ContactForm() {
             id="lastName" 
             type="text" 
             required 
-            className="mt-2 bg-[#101010] border-gray-700 text-white placeholder-gray-400 focus:border-[#00ff9d] focus:ring-[#00ff9d]"
+            disabled={isSubmitting}
+            className="mt-2 bg-[#101010] border-gray-700 text-white placeholder-gray-400 focus:border-[#00ff9d] focus:ring-[#00ff9d] disabled:opacity-50"
             placeholder="Enter your last name"
           />
         </div>
@@ -43,7 +68,8 @@ function ContactForm() {
           id="email" 
           type="email" 
           required 
-          className="mt-2 bg-[#101010] border-gray-700 text-white placeholder-gray-400 focus:border-[#00ff9d] focus:ring-[#00ff9d]"
+          disabled={isSubmitting}
+          className="mt-2 bg-[#101010] border-gray-700 text-white placeholder-gray-400 focus:border-[#00ff9d] focus:ring-[#00ff9d] disabled:opacity-50"
           placeholder="Enter your email address"
         />
       </div>
@@ -54,7 +80,8 @@ function ContactForm() {
           id="subject" 
           type="text" 
           required 
-          className="mt-2 bg-[#101010] border-gray-700 text-white placeholder-gray-400 focus:border-[#00ff9d] focus:ring-[#00ff9d]"
+          disabled={isSubmitting}
+          className="mt-2 bg-[#101010] border-gray-700 text-white placeholder-gray-400 focus:border-[#00ff9d] focus:ring-[#00ff9d] disabled:opacity-50"
           placeholder="What is this regarding?"
         />
       </div>
@@ -65,16 +92,18 @@ function ContactForm() {
           id="message" 
           required 
           rows={6}
-          className="mt-2 bg-[#101010] border-gray-700 text-white placeholder-gray-400 focus:border-[#00ff9d] focus:ring-[#00ff9d] resize-none"
+          disabled={isSubmitting}
+          className="mt-2 bg-[#101010] border-gray-700 text-white placeholder-gray-400 focus:border-[#00ff9d] focus:ring-[#00ff9d] resize-none disabled:opacity-50"
           placeholder="Tell us more about your inquiry..."
         />
       </div>
       
       <Button 
         type="submit" 
-        className="w-full bg-gradient-to-r from-[#00ff9d] to-[#008f57] hover:from-[#00e68a] hover:to-[#007a4a] text-black font-bold py-4 rounded-lg transition-all duration-300"
+        disabled={isSubmitting}
+        className="w-full bg-gradient-to-r from-[#00ff9d] to-[#008f57] hover:from-[#00e68a] hover:to-[#007a4a] text-black font-bold py-4 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Send Message
+        {isSubmitting ? 'Sending...' : 'Send Message'}
       </Button>
     </form>
   );
@@ -178,7 +207,7 @@ export default function ContactPage() {
                     </a>
                     <a href="#" className="w-12 h-12 bg-gray-800 hover:bg-[#00ff9d] rounded-lg flex items-center justify-center transition-all duration-300">
                       <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                        <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.555-2.005.959-3.127 1.184-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
                       </svg>
                     </a>
                   </div>

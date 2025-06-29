@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Button } from "../components/ui/button";
 import { FeaturedArtistCard } from "../components/artist-components";
-import { useFeaturedArtists } from "../hooks/useArtists";
+import ArtistCardSkeleton from "../components/ui/ArtistCardSkeleton";
+import useSWR from "swr";
 import Link from "next/link";
 
 const artworkImages = [
@@ -116,8 +117,11 @@ const MagneticButton = ({ children, className = "" }: { children: React.ReactNod
   );
 };
 
+// Fetcher function for useSWR
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 export default function HomePage() {
-  const { artists: featuredArtists, loading } = useFeaturedArtists();
+  const { data: featuredArtists, error, isLoading } = useSWR('/api/artists/featured', fetcher);
   const [currentArtworkIndex, setCurrentArtworkIndex] = useState(0);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
 
@@ -191,18 +195,31 @@ export default function HomePage() {
             </p>
           </div>
           
-          {loading ? (
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[...Array(3)].map((_, i) => (
+                <ArtistCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : error ? (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-black mx-auto mb-4"></div>
-              <p className="text-black/70">Loading featured artists...</p>
+              <p className="text-black/70">Could not load featured artists.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {featuredArtists.map((artist) => (
+              {featuredArtists?.map((artist: any) => (
                 <FeaturedArtistCard key={artist.id} artist={artist} />
               ))}
             </div>
           )}
+          
+          <div className="text-center mt-12">
+            <Link href="/artists">
+              <Button className="bg-black text-[#00ff9d] hover:bg-gray-900 font-bold px-8 py-3 rounded-full transition-all duration-300">
+                View All Artists
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
