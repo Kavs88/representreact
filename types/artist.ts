@@ -1,28 +1,25 @@
+// Attachment interface for Airtable attachments
+export interface Attachment {
+  id: string;
+  url: string;
+  filename: string;
+}
+
 export interface Artist {
   id: string;
-  name: string;
-  specialty: string;
-  location: string;
-  bio?: string;
-  image: string;
-  slug: string;
-  tags: string[];
-  socialLinks?: {
-    instagram?: string;
-    twitter?: string;
-    website?: string;
-  };
-  featured?: boolean;
-  createdDate?: string;
-  updatedDate?: string;
-  artwork?: string[];
-  layoutConfig?: ArtistLayoutConfig;
-  pressFeatures?: PressFeature[];
-  fields?: {
+  fields: {
+    Name?: string;
+    Specialty?: string;
+    Bio?: string;
+    ProfileImage?: Attachment[];
+    Instagram?: string;
+    Specialties?: string[] | string;
+    Featured?: boolean;
     ThemePrimaryColor?: string;
     ThemeBackgroundColor?: string;
     ThemeTextColor?: string;
-    GeneratedBannerImage?: string;
+    GeneratedBannerImage?: Attachment[];
+    Artwork?: Attachment[];
   };
 }
 

@@ -18,6 +18,17 @@ export function TagBadge({ tag }: TagBadgeProps) {
 }
 
 export function ArtistCard({ artist }: ArtistCardProps) {
+  // Extract data from Airtable format with fallbacks
+  const artistName = artist.fields.Name || 'Unknown Artist';
+  const artistSpecialty = artist.fields.Specialty || 'Artist';
+  const artistBio = artist.fields.Bio || '';
+  const profileImageUrl = artist.fields.ProfileImage?.[0]?.url || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzc0MTUxIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iIjY0NzQ4QiIvPgo8cmVjdCB4PSI2MCIgeT0iMTIwIiB3aWR0aD0iODAiIGhlaWdodD0iNDAiIHJ4PSIyMCIgZmlsbD0iIzY0NzQ4QiIvPgo8L3N2Zz4K';
+  const artistSpecialties = Array.isArray(artist.fields.Specialties) 
+    ? artist.fields.Specialties 
+    : typeof artist.fields.Specialties === 'string'
+      ? artist.fields.Specialties.split(',').map(s => s.trim())
+      : [];
+
   return (
     <motion.div 
       className="group relative"
@@ -35,21 +46,19 @@ export function ArtistCard({ artist }: ArtistCardProps) {
         transition={{ duration: 0.3, ease: "easeOut" }}
       >
         <div className="relative h-80 overflow-hidden bg-gray-900 flex items-center justify-center">
-          {artist.image ? (
-            <motion.img 
-              src={artist.image} 
-              alt={artist.name} 
-              className="w-full h-full object-contain"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.nextElementSibling?.classList.remove('hidden');
-              }}
-            />
-          ) : null}
+          <motion.img 
+            src={profileImageUrl} 
+            alt={artistName} 
+            className="w-full h-full object-contain"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+            }}
+          />
           <div className="hidden w-24 h-24 bg-gray-700 rounded-full flex items-center justify-center text-gray-400 text-4xl font-bold">
-            {artist.name.charAt(0).toUpperCase()}
+            {artistName.charAt(0).toUpperCase()}
           </div>
           <motion.div 
             className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"
@@ -60,7 +69,7 @@ export function ArtistCard({ artist }: ArtistCardProps) {
           
           {/* Tag Badges */}
           <div className="absolute top-3 left-3 flex flex-wrap gap-1 max-w-[calc(100%-24px)]">
-            {artist.tags.slice(0, 3).map((tag: string, index: number) => (
+            {artistSpecialties.slice(0, 3).map((tag: string, index: number) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -70,14 +79,14 @@ export function ArtistCard({ artist }: ArtistCardProps) {
                 <TagBadge tag={tag} />
               </motion.div>
             ))}
-            {artist.tags.length > 3 && (
+            {artistSpecialties.length > 3 && (
               <motion.span 
                 className="inline-block px-2 py-1 text-xs font-semibold bg-black/80 text-white rounded-md"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3 }}
               >
-                +{artist.tags.length - 3}
+                +{artistSpecialties.length - 3}
               </motion.span>
             )}
           </div>
@@ -89,11 +98,11 @@ export function ArtistCard({ artist }: ArtistCardProps) {
             whileHover={{ x: 5 }}
             transition={{ duration: 0.2 }}
           >
-            {artist.name}
+            {artistName}
           </motion.h3>
-          <p className="text-gray-400 mb-2">{artist.specialty}</p>
-          <p className="text-sm text-gray-500 mb-4">{artist.location}</p>
-          <Link href={`/artists/${artist.slug}`}>
+          <p className="text-gray-400 mb-2">{artistSpecialty}</p>
+          <p className="text-sm text-gray-500 mb-4 line-clamp-2">{artistBio}</p>
+          <Link href={`/artists/${artist.id}`}>
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -110,6 +119,17 @@ export function ArtistCard({ artist }: ArtistCardProps) {
 }
 
 export function FeaturedArtistCard({ artist }: ArtistCardProps) {
+  // Extract data from Airtable format with fallbacks
+  const artistName = artist.fields.Name || 'Unknown Artist';
+  const artistSpecialty = artist.fields.Specialty || 'Artist';
+  const artistBio = artist.fields.Bio || '';
+  const profileImageUrl = artist.fields.ProfileImage?.[0]?.url || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzc0MTUxIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSIzMCIgZmlsbD0iIjY0NzQ4QiIvPgo8cmVjdCB4PSI2MCIgeT0iMTIwIiB3aWR0aD0iODAiIGhlaWdodD0iNDAiIHJ4PSIyMCIgZmlsbD0iIzY0NzQ4QiIvPgo8L3N2Zz4K';
+  const artistSpecialties = Array.isArray(artist.fields.Specialties) 
+    ? artist.fields.Specialties 
+    : typeof artist.fields.Specialties === 'string'
+      ? artist.fields.Specialties.split(',').map(s => s.trim())
+      : [];
+
   return (
     <motion.div 
       className="group relative"
@@ -127,21 +147,19 @@ export function FeaturedArtistCard({ artist }: ArtistCardProps) {
         transition={{ duration: 0.3, ease: "easeOut" }}
       >
         <div className="relative h-80 overflow-hidden bg-gray-100 flex items-center justify-center">
-          {artist.image ? (
-            <motion.img 
-              src={artist.image} 
-              alt={artist.name} 
-              className="w-full h-full object-contain"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.nextElementSibling?.classList.remove('hidden');
-              }}
-            />
-          ) : null}
+          <motion.img 
+            src={profileImageUrl} 
+            alt={artistName} 
+            className="w-full h-full object-contain"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+            }}
+          />
           <div className="hidden w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-4xl font-bold">
-            {artist.name.charAt(0).toUpperCase()}
+            {artistName.charAt(0).toUpperCase()}
           </div>
           <motion.div 
             className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"
@@ -152,7 +170,7 @@ export function FeaturedArtistCard({ artist }: ArtistCardProps) {
           
           {/* Tag Badges */}
           <div className="absolute top-3 left-3 flex flex-wrap gap-1 max-w-[calc(100%-24px)]">
-            {artist.tags.slice(0, 3).map((tag: string, index: number) => (
+            {artistSpecialties.slice(0, 3).map((tag: string, index: number) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -162,14 +180,14 @@ export function FeaturedArtistCard({ artist }: ArtistCardProps) {
                 <TagBadge tag={tag} />
               </motion.div>
             ))}
-            {artist.tags.length > 3 && (
+            {artistSpecialties.length > 3 && (
               <motion.span 
                 className="inline-block px-2 py-1 text-xs font-semibold bg-black/80 text-white rounded-md"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3 }}
               >
-                +{artist.tags.length - 3}
+                +{artistSpecialties.length - 3}
               </motion.span>
             )}
           </div>
@@ -181,10 +199,10 @@ export function FeaturedArtistCard({ artist }: ArtistCardProps) {
             whileHover={{ x: 5 }}
             transition={{ duration: 0.2 }}
           >
-            {artist.name}
+            {artistName}
           </motion.h3>
-          <p className="text-black/70 mb-4 font-medium">{artist.specialty}</p>
-          <Link href={`/artists/${artist.slug}`}>
+          <p className="text-black/70 mb-4 font-medium">{artistSpecialty}</p>
+          <Link href={`/artists/${artist.id}`}>
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}

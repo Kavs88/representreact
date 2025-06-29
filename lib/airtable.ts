@@ -1,5 +1,12 @@
 import { z } from 'zod';
 
+// Attachment schema for Airtable's attachment format
+const attachmentSchema = z.object({
+  id: z.string(),
+  url: z.string().url(),
+  filename: z.string(),
+});
+
 // Artist schema for validation - matches actual Airtable table structure
 const artistSchema = z.object({
   id: z.string(),
@@ -7,14 +14,15 @@ const artistSchema = z.object({
     Name: z.string().optional(),
     Specialty: z.string().optional(),
     Bio: z.string().optional(),
-    ProfileImage: z.array(z.object({ url: z.string() })).optional(),
+    ProfileImage: z.array(attachmentSchema).optional(),
     Instagram: z.string().optional(),
     Specialties: z.union([z.array(z.string()), z.string()]).optional(),
     Featured: z.boolean().optional(),
     ThemePrimaryColor: z.string().optional(),
     ThemeBackgroundColor: z.string().optional(),
     ThemeTextColor: z.string().optional(),
-    GeneratedBannerImage: z.string().optional(),
+    GeneratedBannerImage: z.array(attachmentSchema).optional(),
+    Artwork: z.array(attachmentSchema).optional(),
   }),
 });
 
