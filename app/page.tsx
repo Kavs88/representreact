@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { Button } from "../components/ui/button";
 import { FeaturedArtistCard } from "../components/artist-components";
-import { useArtists } from "../hooks/useArtists";
+import { useFeaturedArtists } from "../hooks/useArtists";
 import Link from "next/link";
 
 const artworkImages = [
@@ -117,12 +117,9 @@ const MagneticButton = ({ children, className = "" }: { children: React.ReactNod
 };
 
 export default function HomePage() {
-  const { artists, loading } = useArtists();
+  const { artists: featuredArtists, loading } = useFeaturedArtists();
   const [currentArtworkIndex, setCurrentArtworkIndex] = useState(0);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
-
-  // Get featured artists (first 3)
-  const featuredArtists = artists.slice(0, 3);
 
   useEffect(() => {
     if (!isCarouselPaused) {

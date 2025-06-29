@@ -82,8 +82,8 @@ export function useFeaturedArtists() {
       try {
         setLoading(true);
         
-        // Fetch featured artists from Airtable API
-        const response = await fetch('/api/artists?featured=true');
+        // Fetch featured artists from new API endpoint
+        const response = await fetch('/api/artists/featured');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
