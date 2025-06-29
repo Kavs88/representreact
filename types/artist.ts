@@ -18,6 +18,12 @@ export interface Artist {
   artwork?: string[];
   layoutConfig?: ArtistLayoutConfig;
   pressFeatures?: PressFeature[];
+  fields?: {
+    ThemePrimaryColor?: string;
+    ThemeBackgroundColor?: string;
+    ThemeTextColor?: string;
+    GeneratedBannerImage?: string;
+  };
 }
 
 export interface Artwork {

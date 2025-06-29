@@ -1,12 +1,12 @@
 "use client";
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef } from "react";
 import Link from "next/link";
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import Image from "next/image";
+import { motion, useInView } from "framer-motion";
 import { Button } from "../../../components/ui/button";
 import { TagBadge } from "../../../components/artist-components";
 import { useArtist } from "../../../hooks/useArtists";
 import { useArtwork } from "../../../hooks/useArtwork";
-import { ArtistLayoutConfig, PressFeature } from "../../../types/artist";
 import { useParams } from "next/navigation";
 
 // Animated Text Component
@@ -35,7 +35,7 @@ const AnimatedText = ({ text, className = "", delay = 0 }: { text: string; class
 
 // Reveal on Scroll Component
 const RevealOnScroll = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => {
-  const ref = React.useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
@@ -55,7 +55,9 @@ const RevealOnScroll = ({ children, delay = 0 }: { children: React.ReactNode; de
 };
 
 function SocialLinks({ social }: { social: any }) {
-  if (!social || Object.keys(social).length === 0) {
+  // Check if social links exist and have any non-empty values
+  if (!social || Object.keys(social).length === 0 || 
+      (!social.instagram && !social.twitter && !social.website)) {
     return null;
   }
   
@@ -115,9 +117,16 @@ function SocialLinks({ social }: { social: any }) {
 
 export default function ArtistProfile() {
   const params = useParams();
-  const slug = params.slug as string;
+  const slug = params?.slug as string;
   const { artist, loading, error } = useArtist(slug);
   const { artwork, loading: artworkLoading, error: artworkError } = useArtwork(artist?.id);
+
+  // Create theme styles with fallbacks
+  const themeStyles = {
+    '--bg-color': artist?.fields?.ThemeBackgroundColor || '#0e0e0e',
+    '--text-color': artist?.fields?.ThemeTextColor || '#ffffff',
+    '--primary-color': artist?.fields?.ThemePrimaryColor || '#00ff9d',
+  } as React.CSSProperties;
 
   if (loading) {
     return (
@@ -142,7 +151,7 @@ export default function ArtistProfile() {
           The artist you're looking for doesn't seem to exist. They might have moved to a different gallery or the link is incorrect.
         </p>
         <Link href="/artists">
-          <Button className="bg-gradient-to-r from-[#00ff9d] to-[#008f57] hover:from-[#00e68a] hover:to-[#007a4a] text-black font-bold text-lg px-8 py-4 rounded-full shadow-2xl transition-all duration-300">
+          <Button>
             Back to Artists
           </Button>
         </Link>
@@ -152,21 +161,46 @@ export default function ArtistProfile() {
 
   return (
     <motion.div 
-      className="min-h-screen bg-[#0e0e0e] text-white font-sans"
+      className="min-h-screen bg-[--bg-color] text-[--text-color] font-sans transition-colors duration-500"
+      style={themeStyles}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
-      {/* Hero Section */}
-      <section className="relative h-[60vh] md:h-[70vh] flex items-end justify-start p-8 md:p-12" style={{
-        backgroundImage: `url(${artist.image || 'https://source.unsplash.com/1600x900/?abstract,art'})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }}>
+      {/* Hero Banner Section */}
+      <section className="relative h-[60vh] md:h-[70vh] flex items-end justify-start p-8 md:p-12 overflow-hidden">
+        {/* Conditional Banner Display */}
+        {artist.fields?.GeneratedBannerImage ? (
+          // Use generated banner image
+          <div className="absolute inset-0">
+            <Image
+              src={artist.fields.GeneratedBannerImage}
+              alt={`${artist.name} banner`}
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+        ) : (
+          // Fallback to theme background color or profile image
+          <div 
+            className="absolute inset-0"
+            style={{
+              backgroundColor: artist.fields?.ThemeBackgroundColor || '#0e0e0e',
+              backgroundImage: artist.image ? `url(${artist.image})` : 'none',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          />
+        )}
+        
+        {/* Overlay for text legibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        
+        {/* Artist Info Overlay */}
         <div className="relative z-10 max-w-4xl">
           <motion.h1 
-            className="text-5xl md:text-7xl font-black mb-4 tracking-tight"
+            className="text-5xl md:text-7xl font-black mb-4 tracking-tight text-[--primary-color] drop-shadow-lg"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
@@ -174,7 +208,7 @@ export default function ArtistProfile() {
             {artist.name}
           </motion.h1>
           <motion.p 
-            className="text-xl md:text-2xl text-gray-200"
+            className="text-xl md:text-2xl text-gray-200 drop-shadow-lg"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
@@ -195,51 +229,94 @@ export default function ArtistProfile() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              <h2 className="text-3xl font-bold mb-6 text-[#00ff9d]">Biography</h2>
+              <h2 className="text-3xl font-bold mb-6 text-[--primary-color]">Biography</h2>
               <p className="text-gray-300 mb-8 leading-relaxed">{artist.bio || "No biography available."}</p>
               
-              <div className="mb-8">
-                <h3 className="font-semibold text-lg mb-2 text-white">Location</h3>
-                <p className="text-gray-400">{artist.location}</p>
-              </div>
+              {/* Location - only show if exists */}
+              {artist.location && (
+                <div className="mb-8">
+                  <h3 className="font-semibold text-lg mb-2 text-white">Location</h3>
+                  <p className="text-gray-400">{artist.location}</p>
+                </div>
+              )}
 
+              {/* Tags - only show if exists and not empty */}
               {artist.tags && artist.tags.length > 0 && (
                 <div className="mb-8">
                   <h3 className="font-semibold text-lg mb-4 text-white">Tags</h3>
                   <div className="flex flex-wrap gap-2">
-                    {artist.tags.map((tag) => <TagBadge key={tag} tag={tag} />)}
+                    {artist.tags.map((tag) => (
+                      <TagBadge key={tag} tag={tag} />
+                    ))}
                   </div>
                 </div>
               )}
               
-              <SocialLinks social={artist.social} />
+              {/* Social Links - component handles its own conditional rendering */}
+              <SocialLinks social={artist.socialLinks} />
             </motion.div>
           </div>
 
           {/* Right Column: Artwork Gallery */}
           <div className="md:col-span-2">
-            <h2 className="text-3xl font-bold mb-8 text-center text-[#00ff9d]">Portfolio</h2>
-            {artworkLoading && <p className="text-center">Loading artwork...</p>}
-            {artworkError && <p className="text-center text-red-500">Error loading artwork.</p>}
+            <h2 className="text-3xl font-bold mb-8 text-center text-[--primary-color]">Portfolio</h2>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-              {!artworkLoading && !artworkError && artwork.map((art) => (
+            {artworkLoading && (
+              <div className="text-center py-12">
                 <motion.div 
-                  key={art.id} 
-                  className="group relative overflow-hidden rounded-lg"
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                >
-                  <img src={art.image || 'https://source.unsplash.com/800x600/?art,placeholder'} alt={art.title} className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105" />
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                    <h3 className="text-white text-lg font-bold">{art.title}</h3>
-                    <p className="text-gray-300 text-sm">{art.year}</p>
+                  className="animate-spin rounded-full h-12 w-12 border-b-2 border-[--primary-color] mx-auto mb-4"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                />
+                <p className="text-gray-400">Loading artwork...</p>
+              </div>
+            )}
+            
+            {artworkError && (
+              <div className="text-center py-12">
+                <p className="text-red-500 mb-4">Error loading artwork.</p>
+                <p className="text-gray-400">Please try refreshing the page.</p>
+              </div>
+            )}
+            
+            {/* Artwork Gallery - only show if artwork exists and not empty */}
+            {!artworkLoading && !artworkError && artwork && artwork.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                {artwork.map((art) => (
+                  <motion.div 
+                    key={art.id} 
+                    className="group relative overflow-hidden rounded-lg"
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                  >
+                    <img 
+                      src={art.image || 'https://source.unsplash.com/800x600/?art,placeholder'} 
+                      alt={art.title || 'Artwork'} 
+                      className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105" 
+                    />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                      <h3 className="text-white text-lg font-bold">{art.title || 'Untitled'}</h3>
+                      {art.year && <p className="text-gray-300 text-sm">{art.year}</p>}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              /* Fallback when no artwork is available */
+              !artworkLoading && !artworkError && (
+                <div className="text-center py-12">
+                  <div className="bg-gray-800/50 rounded-lg p-8 max-w-md mx-auto">
+                    <svg className="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <h3 className="text-xl font-semibold text-white mb-2">No Artwork Available</h3>
+                    <p className="text-gray-400">This artist hasn't uploaded any artwork yet.</p>
                   </div>
-                </motion.div>
-              ))}
-            </div>
+                </div>
+              )
+            )}
           </div>
         </div>
       </div>

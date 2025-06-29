@@ -14,7 +14,7 @@ export async function GET(
 
     // Build the URL with filter formula
     const url = new URL(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${ARTISTS_TABLE}`);
-    url.searchParams.append('filterByFormula', `{Slug} = '${slug}'`);
+    url.searchParams.append('filterByFormula', `{Name} = '${slug}'`);
     url.searchParams.append('maxRecords', '1');
 
     // Fetch artist by slug using REST API
@@ -50,23 +50,30 @@ export async function GET(
       id: record.id,
       name: record.fields.Name || '',
       specialty: record.fields.Specialty || '',
-      location: record.fields.Location || '',
+      location: '', // Not in your current schema
       bio: record.fields.Bio || '',
-      image: record.fields.ProfileImage?.[0]?.url || '',
-      slug: record.fields.Slug || '',
-      tags: Array.isArray(record.fields.Specialties)
-        ? record.fields.Specialties
-        : typeof record.fields.Specialties === 'string'
-          ? record.fields.Specialties.split(',').map((s: string) => s.trim())
+      image: record.fields.ProfileImage || '',
+      slug: record.fields.Name || '', // Using Name as slug for now
+      tags: Array.isArray(record.fields.Tags)
+        ? record.fields.Tags
+        : typeof record.fields.Tags === 'string'
+          ? record.fields.Tags.split(',').map((s: string) => s.trim())
           : [],
       socialLinks: {
-        instagram: record.fields.Instagram || '',
-        twitter: record.fields.Twitter || '',
-        website: record.fields.Website || '',
+        instagram: record.fields.SocialLinks || '',
+        twitter: '',
+        website: '',
       },
       featured: record.fields.Featured || false,
-      createdDate: record.fields['Created Date'] || '',
-      updatedDate: record.fields['Updated Date'] || '',
+      createdDate: '',
+      updatedDate: '',
+      // Include theme fields and generated banner image
+      fields: {
+        ThemePrimaryColor: record.fields.ThemePrimaryColor || '',
+        ThemeBackgroundColor: record.fields.ThemeBackgroundColor || '',
+        ThemeTextColor: record.fields.ThemeTextColor || '',
+        GeneratedBannerImage: record.fields.GeneratedBannerImage || '',
+      }
     };
 
     return NextResponse.json(artist);
