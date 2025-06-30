@@ -126,13 +126,17 @@ const processRecord = (record: any): Artist | null => {
 };
 
 // Fetch all artists, validate, and return only valid records
-export const getArtists = async (): Promise<Artist[]> => {
+export const getArtists = async (options: { featuredOnly?: boolean } = {}): Promise<Artist[]> => {
   try {
     if (!AIRTABLE_BASE_ID || !AIRTABLE_API_KEY) {
       console.error('Missing Airtable configuration');
       return [];
     }
-    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${ARTISTS_TABLE}`;
+    const { featuredOnly } = options;
+    let url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${ARTISTS_TABLE}`;
+    if (featuredOnly) {
+      url += '?filterByFormula=%7BFeatured%7D%3D1'; // {Featured}=1 URL-encoded
+    }
     const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
