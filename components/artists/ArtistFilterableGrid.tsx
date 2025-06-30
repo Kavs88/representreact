@@ -1,44 +1,16 @@
 "use client";
 import React from "react";
-import { Button } from "./ui/button";
-import { ArtistCard } from "./artist-components";
+import { Button } from "../ui/button";
+import { ArtistCard } from "../artist-components";
 
-interface ArtistsFilterProps {
+interface ArtistFilterableGridProps {
   artists: any[];
+  allTags: string[];
 }
 
-export default function ArtistsFilter({ artists }: ArtistsFilterProps) {
+export default function ArtistFilterableGrid({ artists, allTags }: ArtistFilterableGridProps) {
   const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
   const [searchTerm, setSearchTerm] = React.useState("");
-
-  // Add debugging
-  console.log("ArtistsFilter received artists:", artists);
-
-  // Get all unique tags from artists with error handling
-  const allTags = React.useMemo(() => {
-    if (!artists || !Array.isArray(artists)) {
-      console.warn("Artists is not an array:", artists);
-      return [];
-    }
-
-    const tags = artists.flatMap(artist => {
-      if (!artist || !artist.fields) {
-        console.warn("Artist or artist.fields is missing:", artist);
-        return [];
-      }
-
-      const specialties = artist.fields.Specialties;
-      if (Array.isArray(specialties)) {
-        return specialties;
-      } else if (typeof specialties === 'string') {
-        return specialties.split(',').map(s => s.trim());
-      } else {
-        return [];
-      }
-    });
-    
-    return Array.from(new Set(tags)).sort();
-  }, [artists]);
 
   // Filter artists based on selected tags and search term
   const filteredArtists = React.useMemo(() => {

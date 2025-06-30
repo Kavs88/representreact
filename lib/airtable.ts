@@ -150,4 +150,60 @@ export const getArtists = async (): Promise<Artist[]> => {
     console.error('Error fetching artists:', error);
     return [];
   }
+};
+
+// Efficiently fetch all unique tags from artists
+export const getAllTags = async (): Promise<string[]> => {
+  try {
+    if (!AIRTABLE_BASE_ID || !AIRTABLE_API_KEY) {
+      console.error('Missing Airtable configuration');
+      return [];
+    }
+
+    // Only fetch the Specialties field to minimize data transfer
+    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${ARTISTS_TABLE}?fields[]=Specialties`;
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`Airtable API error: ${response.status}`);
+      return [];
+    }
+
+    const data = await response.json();
+    if (!data.records) return [];
+
+    // Extract all unique tags from the Specialties field
+    const allTags = new Set<string>();
+    
+    data.records.forEach((record: any) => {
+      if (record.fields && record.fields.Specialties) {
+        const specialties = record.fields.Specialties;
+        
+        if (Array.isArray(specialties)) {
+          specialties.forEach((tag: string) => {
+            if (tag && typeof tag === 'string') {
+              allTags.add(tag.trim());
+            }
+          });
+        } else if (typeof specialties === 'string') {
+          specialties.split(',').forEach((tag: string) => {
+            const trimmedTag = tag.trim();
+            if (trimmedTag) {
+              allTags.add(trimmedTag);
+            }
+          });
+        }
+      }
+    });
+
+    return Array.from(allTags).sort();
+  } catch (error) {
+    console.error('Error fetching tags:', error);
+    return [];
+  }
 }; 
